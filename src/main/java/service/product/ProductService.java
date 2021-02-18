@@ -52,9 +52,9 @@ public class ProductService implements IProductService {
        Product product= null;
        Connection connection = getConnection();
         try {
-            PreparedStatement p = connection.prepareStatement("select * from product where id=?");
-            p.setInt(1, id);
-            ResultSet resultSet = p.executeQuery();
+            CallableStatement callableStatement = connection.prepareCall("{CALL get_product_by_id(?)}");
+            callableStatement.setInt(1, id);
+            ResultSet resultSet = callableStatement.executeQuery();
             while (resultSet.next()){
 //                int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
@@ -64,6 +64,19 @@ public class ProductService implements IProductService {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+//        try {
+//            PreparedStatement p = connection.prepareStatement("select * from product where id=?");
+//            p.setInt(1, id);
+//            ResultSet resultSet = p.executeQuery();
+//            while (resultSet.next()){
+////                int id = resultSet.getInt("id");
+//                String name = resultSet.getString("name");
+//                String desription = resultSet.getString("description");
+//                product = new Product(id, name, desription);
+//            }
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
         return product;
     }
 
