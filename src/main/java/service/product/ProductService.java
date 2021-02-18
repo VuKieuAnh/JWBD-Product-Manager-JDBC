@@ -122,7 +122,7 @@ public class ProductService implements IProductService {
 
             //
 
-            // Insert user
+            // Bước 1: Thêm 1 sản phẩm vào bảng product
 
             //
 
@@ -133,34 +133,35 @@ public class ProductService implements IProductService {
             pstmt.setString(2, product.getDescription());
 
             int rowAffected = pstmt.executeUpdate();
+//            pstmt.executeUpdate();
 
-            // get user id
+            // Bước 2: Lấy id của sản phẩm đó
 
             rs = pstmt.getGeneratedKeys();
 
-            int userId = 0;
+            int pId = 0;
 
             if (rs.next())
 
-                userId = rs.getInt(1);
+                pId = rs.getInt(1);
 
             //
 
-            // in case the insert operation successes, assign permision to user
+            // Thêm mới vào bảng product_permision
 
             //
 
             if (rowAffected == 1) {
 
-                // assign permision to user
+                // assign permision to product
 
                 String sqlPivot = "INSERT INTO product_permision(product_id,permision_id) VALUES(?,?)";
 
                 pstmtAssignment = conn.prepareStatement(sqlPivot);
-
+                //Lấy danh sách id của permision và thêm mới vào bảng product_permision
                 for (int permisionId : p) {
 
-                    pstmtAssignment.setInt(1, userId);
+                    pstmtAssignment.setInt(1, pId);
 
                     pstmtAssignment.setInt(2, permisionId);
 
