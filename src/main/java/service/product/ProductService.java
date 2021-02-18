@@ -12,7 +12,7 @@ public class ProductService implements IProductService {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3308/productmanager",
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3308/productmanager1",
                     "root",
                     "123456"
             );
@@ -95,4 +95,125 @@ public class ProductService implements IProductService {
         }
         return check;
     }
+
+    @Override
+    public boolean save(Product product, int[] p) {
+        Connection conn = null;
+
+        // for insert a new user
+
+        PreparedStatement pstmt = null;
+
+        // for assign permision to user
+
+        PreparedStatement pstmtAssignment = null;
+
+        // for getting user id
+
+        ResultSet rs = null;
+
+        try {
+
+            conn = getConnection();
+
+            // set auto commit to false
+
+            conn.setAutoCommit(false);
+
+            //
+
+            // Insert user
+
+            //
+
+            pstmt = conn.prepareStatement("INSERT INTO product  (name, description) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+
+            pstmt.setString(1, product.getName());
+
+            pstmt.setString(2, product.getDescription());
+
+            int rowAffected = pstmt.executeUpdate();
+
+            // get user id
+
+            rs = pstmt.getGeneratedKeys();
+
+            int userId = 0;
+
+            if (rs.next())
+
+                userId = rs.getInt(1);
+
+            //
+
+            // in case the insert operation successes, assign permision to user
+
+            //
+
+            if (rowAffected == 1) {
+
+                // assign permision to user
+
+                String sqlPivot = "INSERT INTO product_permision(product_id,permision_id) VALUES(?,?)";
+
+                pstmtAssignment = conn.prepareStatement(sqlPivot);
+
+                for (int permisionId : p) {
+
+                    pstmtAssignment.setInt(1, userId);
+
+                    pstmtAssignment.setInt(2, permisionId);
+
+                    pstmtAssignment.executeUpdate();
+
+                }
+
+                conn.commit();
+
+            } else {
+
+                conn.rollback();
+
+            }
+
+        } catch (SQLException ex) {
+
+            // roll back the transaction
+
+            try {
+
+                if (conn != null)
+
+                    conn.rollback();
+
+            } catch (SQLException e) {
+
+                System.out.println(e.getMessage());
+
+            }
+
+            System.out.println(ex.getMessage());
+
+        } finally {
+
+            try {
+
+                if (rs != null) rs.close();
+
+                if (pstmt != null) pstmt.close();
+
+                if (pstmtAssignment != null) pstmtAssignment.close();
+
+                if (conn != null) conn.close();
+
+            } catch (SQLException e) {
+
+                System.out.println(e.getMessage());
+
+            }
+
+        }
+        return false;
+    }
+
 }

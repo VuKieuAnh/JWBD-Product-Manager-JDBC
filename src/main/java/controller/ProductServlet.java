@@ -60,9 +60,18 @@ public class ProductServlet extends HttpServlet {
             case "edit":
                 showFormEidt(request, response);
                 break;
+            case "permision":
+                addProductPermision(request, response);
+                break;
 
         }
 
+    }
+
+    private void addProductPermision(HttpServletRequest request, HttpServletResponse response) {
+        Product p = new Product("SP1", "Mo ta sp1");
+        int[] permision = {1, 2, 4};
+        productService.save(p, permision);
     }
 
     private void showFormEidt(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
