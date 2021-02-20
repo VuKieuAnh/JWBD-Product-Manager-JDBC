@@ -91,7 +91,7 @@ public class ProductService implements IProductService {
 
         PreparedStatement pstmtAssignment = null;
 
-        // for getting user id
+        // for getting product id
 
         ResultSet rs = null;
 
@@ -130,7 +130,7 @@ public class ProductService implements IProductService {
 
             //
 
-            // Thêm mới vào bảng product_permision
+            // Thêm mới vào bảng product_categories
 
             //
 
@@ -138,7 +138,7 @@ public class ProductService implements IProductService {
 
                 // assign permision to product
 
-                String sqlPivot = "INSERT INTO product_permision(product_id,permision_id) VALUES(?,?)";
+                String sqlPivot = "INSERT INTO product_category(product_id,category_id) VALUES(?,?)";
 
                 pstmtAssignment = connection.prepareStatement(sqlPivot);
                 //Lấy danh sách id của permision và thêm mới vào bảng product_permision

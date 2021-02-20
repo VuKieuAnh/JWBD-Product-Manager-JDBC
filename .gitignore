@@ -1,6 +1,8 @@
 .gradle
 **/build/
 !src/**/build/
+src/java/service/SingletinConnection.java
+
 
 # Ignore Gradle GUI config
 gradle-app.setting
