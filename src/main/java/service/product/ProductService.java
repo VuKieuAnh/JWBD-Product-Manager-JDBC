@@ -1,6 +1,7 @@
 package service.product;
 
 import model.Product;
+import service.SingletonConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,29 +9,13 @@ import java.util.List;
 
 public class ProductService implements IProductService {
 
-    protected Connection getConnection() {
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3308/productmanager1",
-                    "root",
-                    "123456"
-            );
-        } catch (ClassNotFoundException e) {
-            System.out.println("không có driver");
-        } catch (SQLException throwables) {
-            System.out.println("Không kết nối được");
-        }
-        System.out.println("ket noi thanh cong");
 
-        return connection;
-    }
+    private Connection connection = SingletonConnection.getConnection();
 
 
     @Override
     public List<Product> findAll() {
         List<Product> products = new ArrayList<>();
-            Connection connection = getConnection();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("select * from product");
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -50,7 +35,6 @@ public class ProductService implements IProductService {
     @Override
     public Product findById(int id) {
        Product product= null;
-       Connection connection = getConnection();
         try {
             CallableStatement callableStatement = connection.prepareCall("{CALL get_product_by_id(?)}");
             callableStatement.setInt(1, id);
@@ -82,7 +66,7 @@ public class ProductService implements IProductService {
 
     @Override
     public boolean update(Product product) {
-        Connection connection = getConnection();
+
         boolean check = false;
         try {
             PreparedStatement p = connection.prepareStatement("update product set name= ?, description= ? where id =?");
@@ -98,7 +82,6 @@ public class ProductService implements IProductService {
 
     @Override
     public boolean save(Product product, int[] p) {
-        Connection conn = null;
 
         // for insert a new user
 
@@ -114,11 +97,11 @@ public class ProductService implements IProductService {
 
         try {
 
-            conn = getConnection();
+            connection = SingletonConnection.getConnection();
 
             // set auto commit to false
 
-            conn.setAutoCommit(false);
+            connection.setAutoCommit(false);
 
             //
 
@@ -126,7 +109,7 @@ public class ProductService implements IProductService {
 
             //
 
-            pstmt = conn.prepareStatement("INSERT INTO product  (name, description) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            pstmt = connection.prepareStatement("INSERT INTO product  (name, description) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
 
             pstmt.setString(1, product.getName());
 
@@ -157,7 +140,7 @@ public class ProductService implements IProductService {
 
                 String sqlPivot = "INSERT INTO product_permision(product_id,permision_id) VALUES(?,?)";
 
-                pstmtAssignment = conn.prepareStatement(sqlPivot);
+                pstmtAssignment = connection.prepareStatement(sqlPivot);
                 //Lấy danh sách id của permision và thêm mới vào bảng product_permision
                 for (int permisionId : p) {
 
@@ -169,11 +152,11 @@ public class ProductService implements IProductService {
 
                 }
 
-                conn.commit();
+                connection.commit();
 
             } else {
 
-                conn.rollback();
+                connection.rollback();
 
             }
 
@@ -183,9 +166,9 @@ public class ProductService implements IProductService {
 
             try {
 
-                if (conn != null)
+                if (connection != null)
 
-                    conn.rollback();
+                    connection.rollback();
 
             } catch (SQLException e) {
 
@@ -205,7 +188,7 @@ public class ProductService implements IProductService {
 
                 if (pstmtAssignment != null) pstmtAssignment.close();
 
-                if (conn != null) conn.close();
+                if (connection != null) connection.close();
 
             } catch (SQLException e) {
 

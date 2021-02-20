@@ -69,8 +69,8 @@ public class ProductServlet extends HttpServlet {
     }
 
     private void addProductPermision(HttpServletRequest request, HttpServletResponse response) {
-        Product p = new Product("SP Demo", "Mo ta sp demo");
-        int[] permision = {1, 3};
+        Product p = new Product("SP cua anh Hieu", "Mo ta sp demo");
+        int[] permision = {1,3, 4};
         productService.save(p, permision);
     }
 
